@@ -1,0 +1,45 @@
+---
+layout: archive
+---
+
+{{ content }}
+
+{% assign collections = 'body,mind,occupational,expressive' | split: ',' %}
+
+<div class="collection-index">
+  <ul>
+    {% for collection_name in collections %}
+      <li><a href="#{{ collection_name }}">{{ collection_name | capitalize }}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% for collection_name in collections %}
+  {% assign collection = site[collection_name] %}
+  {% assign postsInYear = collection | where_exp: "item", "item.hidden != true" | group_by_exp: 'post', 'post.date | date: "%Y"' %}
+  <section id="{{ collection_name }}" class="taxonomy__section">
+    <h2 class="archive__subtitle">{{ collection_name | capitalize }}</h2>
+    <ul class="taxonomy__index">
+      {% for year in postsInYear %}
+        <li>
+          <a href="#{{ collection_name }}-{{ year.name }}">
+            <strong>{{ year.name }}</strong> <span class="taxonomy__count">{{ year.items | size }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+    <div class="entries-list">
+      {% for year in postsInYear %}
+        <section id="{{ collection_name }}-{{ year.name }}" class="taxonomy__section">
+          <h3 class="archive__subtitle">{{ year.name }}</h3>
+          <div class="entries-list">
+            {% for post in year.items %}
+              {% include archive-single.html type='list' %}
+            {% endfor %}
+          </div>
+        </section>
+      {% endfor %}
+    </div>
+    <a href="#page-title" class="back-to-top">{{ site.data.ui-text[site.locale].back_to_top | default: 'Back to Top' }} &uarr;</a>
+  </section>
+{% endfor %}
